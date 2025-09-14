@@ -27,20 +27,20 @@ install: build
 # Copy/Install the extension into local extensions dir
 ext-install:
     @echo "Installing GNOME Shell extension to {{ext_dest}}"
-    install -d "{{ext_dest}}"
-    install -m 0644 "{{ext_src}}/metadata.json" "{{ext_dest}}/metadata.json"
-    install -m 0644 "{{ext_src}}/extension.js" "{{ext_dest}}/extension.js"
+    rm -rf "{{ext_dest}}"
+    mkdir -p "{{ext_dest}}"
+    cp -r "{{ext_src}}/"* "{{ext_dest}}/"
 
 # Enable the extension
 ext-enable: ext-install
     @echo "Enabling extension {{ext_uuid}}…"
-    gnome-extensions enable {{ext_uuid}} || true
+    gnome-extensions enable {{ext_uuid}}
     @echo "If on Wayland, you may need to log out/in the first time."
 
 # Disable the extension
 ext-disable:
     @echo "Disabling extension {{ext_uuid}}…"
-    gnome-extensions disable {{ext_uuid}} || true
+    gnome-extensions disable {{ext_uuid}}
 
 # Remove the extension files
 ext-uninstall: ext-disable
@@ -49,8 +49,21 @@ ext-uninstall: ext-disable
 
 # Quick status check
 ext-status:
-    gnome-extensions info {{ext_uuid}} || true
-    gdbus introspect --session --dest com.github.moljac024.quickslot --object-path /com/github/moljac024/quickslot || true
+    gnome-extensions info {{ext_uuid}}
+    gdbus introspect --session --dest com.github.moljac024.quickslot --object-path /com/github/moljac024/quickslot
+
+# Reinstall extension files and toggle it
+reload:
+    @echo "Reloading QuickSlot extension (reinstall + toggle)…"
+    just ext-install
+    gnome-extensions disable {{ext_uuid}} || true
+    gnome-extensions enable {{ext_uuid}}
+    @echo "Reloaded {{ext_uuid}}."
+
+# Follow GNOME Shell logs; useful after `just reload`
+logs:
+    @echo "Tailing GNOME Shell logs (Ctrl-C to stop)…"
+    journalctl --user -f | grep -Ei 'gnome-shell|quickslot'
 
 # Run examples
 run ID='org.gnome.Terminal.desktop':
