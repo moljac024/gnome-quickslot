@@ -1,4 +1,4 @@
-# gn-runorraise
+# gnome-quickslot
 
 Wayland-safe **run-or-raise** for GNOME Shell that uses the _same internal logic_ as the dock:
 
@@ -10,7 +10,7 @@ No X11 hacks; we call `org.gnome.Shell.Eval` and use `Shell.AppSystem.lookup_app
 ## Install
 
 ```bash
-git clone https://github.com/<your-gh-username>/gn-runorraise
-cd gn-runorraise
+git clone https://github.com/moljac024/gnome-quickslot
+cd gnome-quickslot
 just install
 ```
