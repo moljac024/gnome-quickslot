@@ -1,0 +1,7 @@
+{
+  "uuid": "quickslot@moljac024.github",
+  "name": "QuickSlot",
+  "description": "Expose DBus methods to run-or-raise apps by Desktop ID or dock slot, for use with the quickslot CLI.",
+  "shell-version": ["45", "46", "47", "48", "49"],
+  "version": 1
+}
