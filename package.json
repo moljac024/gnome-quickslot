@@ -1,0 +1,25 @@
+{
+  "name": "gnome-quickslot",
+  "description": "",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moljac024/gnome-quickslot.git"
+  },
+  "version": "0.1.0",
+  "scripts": {},
+  "prettier": {
+    "semi": false,
+    "trailingComma": "all",
+    "bracketSameLine": true
+  },
+  "dependencies": {
+    "@girs/gjs": "^4.0.0-beta.36",
+    "@girs/gnome-shell": "^48.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^9.35.0",
+    "eslint-plugin-jsdoc": "^57.0.8",
+    "typescript": "^5.9.2"
+  }
+}

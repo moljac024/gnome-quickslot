@@ -1,54 +1,44 @@
 # Use bash with strict flags
 set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 
-bin_name := 'gnome-quickslot'
-bin_dir  := 'bin'
-bin_path := bin_dir + '/' + bin_name
-
-ext_uuid := 'quickslot@moljac024.github'
 home     := env_var('HOME')
-ext_src  := 'extension'
+src  := 'src'
+build_dir := "dist"
+ext_uuid := 'quickslot@moljac024.github'
 ext_dest := home + '/.local/share/gnome-shell/extensions/' + ext_uuid
 
-# Default target
-default: build
-
-# Build static Go binary (create bin/ first; show resolved paths)
 build:
-    @echo "Building to: {{bin_path}}"
-    mkdir -p "{{bin_dir}}"
-    CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o "{{bin_path}}" ./cmd
-
-# Install binary to /usr/local/bin
-install: build
-    @echo "Installing {{bin_name}} to /usr/local/bin (sudo)…"
-    sudo install -Dm755 "{{bin_path}}" /usr/local/bin/{{bin_name}}
+    @echo "Building the extension…"
+    rm -rf "{{build_dir}}"
+    npx tsc
+    cp "{{src}}/metadata.json" "{{build_dir}}/"
+    @echo "Build complete."
 
 # Copy/Install the extension into local extensions dir
-ext-install:
+install:
     @echo "Installing GNOME Shell extension to {{ext_dest}}"
     rm -rf "{{ext_dest}}"
     mkdir -p "{{ext_dest}}"
-    cp -r "{{ext_src}}/"* "{{ext_dest}}/"
+    cp -r "{{src}}/"* "{{ext_dest}}/"
 
 # Enable the extension
-ext-enable: ext-install
+enable: install
     @echo "Enabling extension {{ext_uuid}}…"
     gnome-extensions enable {{ext_uuid}}
     @echo "If on Wayland, you may need to log out/in the first time."
 
 # Disable the extension
-ext-disable:
+disable:
     @echo "Disabling extension {{ext_uuid}}…"
     gnome-extensions disable {{ext_uuid}}
 
 # Remove the extension files
-ext-uninstall: ext-disable
+uninstall: disable
     @echo "Removing extension at {{ext_dest}}"
     rm -rf "{{ext_dest}}"
 
 # Quick status check
-ext-status:
+status:
     gnome-extensions info {{ext_uuid}}
     gdbus introspect --session --dest com.github.moljac024.quickslot --object-path /com/github/moljac024/quickslot
 
@@ -64,17 +54,3 @@ reload:
 logs:
     @echo "Tailing GNOME Shell logs (Ctrl-C to stop)…"
     journalctl --user -f | grep -Ei 'gnome-shell|quickslot'
-
-# Run examples
-run ID='org.gnome.Terminal.desktop':
-    ./{{bin_path}} --id {{ID}}
-
-slot N='1':
-    ./{{bin_path}} --slot {{N}}
-
-favs:
-    ./{{bin_path}} --list-favorites
-
-# Clean build artifacts
-clean:
-    rm -rf "{{bin_dir}}"

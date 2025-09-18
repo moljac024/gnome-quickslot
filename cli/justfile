@@ -1,0 +1,34 @@
+# Use bash with strict flags
+set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
+
+bin_name := 'gnome-quickslot'
+bin_dir  := 'bin'
+bin_path := bin_dir + '/' + bin_name
+
+# Default target
+default: build
+
+# Build static Go binary (create bin/ first; show resolved paths)
+build:
+    @echo "Building to: {{bin_path}}"
+    mkdir -p "{{bin_dir}}"
+    CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o "{{bin_path}}" ./cmd
+
+# Install binary to /usr/local/bin
+install: build
+    @echo "Installing {{bin_name}} to /usr/local/bin (sudo)…"
+    sudo install -Dm755 "{{bin_path}}" /usr/local/bin/{{bin_name}}
+
+# Run examples
+run ID='org.gnome.Terminal.desktop':
+    ./{{bin_path}} --id {{ID}}
+
+slot N='1':
+    ./{{bin_path}} --slot {{N}}
+
+favs:
+    ./{{bin_path}} --list-favorites
+
+# Clean build artifacts
+clean:
+    rm -rf "{{bin_dir}}"
